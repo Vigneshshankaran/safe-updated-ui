@@ -664,6 +664,7 @@ h1 {
 .safe-card-header {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .safe-name-input {
@@ -687,7 +688,10 @@ h1 {
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-bottom: 12px;
+  padding: 6px 0;
+  margin-bottom: 0;
+  border-radius: 8px;
+  transition: background 0.15s;
 }
 
 .series-investor-input {
@@ -824,8 +828,100 @@ b {
 }
 
 .results-column-sticky {
-  position: static;
+  position: relative;
 }
+
+/* ===== Stale results gating (manual Calculate) ===== */
+#breakdown-section { position: relative; }
+
+.results-column-sticky.is-stale > :not(.stale-overlay),
+#breakdown-section.is-stale > div:not(.stale-overlay) {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.15s ease;
+}
+
+.stale-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.is-stale > .stale-overlay { display: flex; }
+
+.stale-card {
+  background: #FEF9EC;
+  border: 1px solid #f0cf72;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 6px 20px rgba(146, 109, 8, 0.18);
+  max-width: 420px;
+  width: auto;
+}
+.stale-card-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stale-card-title { font-size: 14px; font-weight: 700; color: #92510a; line-height: 1.3; }
+.stale-card-sub { font-size: 12.5px; color: #b06f12; line-height: 1.35; }
+.stale-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  background: #fbe9b0;
+  color: #92510a;
+  border: 1px solid #f0cf72;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.stale-recalc-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: #b45309;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease;
+}
+.stale-recalc-btn:hover { background: #92410a; }
+
+/* Calculate button inside the priced round card */
+.priced-calc-row { margin-top: 28px; }
+.priced-calc-btn {
+  width: 100%;
+  height: 48px;
+  background: #5f46ff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.12s ease;
+}
+.priced-calc-btn:hover { background: #4a34e0; }
 
 /* Responsive Stacking */
 @media (max-width: 1099px) {
@@ -1357,11 +1453,10 @@ table select {
   background-color: var(--text-light);
 }
 
-/* 2-column grid for shareholder cards */
+/* Shareholder list rows */
 #shareholders-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 #safes-body {
@@ -1370,16 +1465,73 @@ table select {
   gap: 12px;
 }
 
-/* Odd last card spans full width */
-#shareholders-body .shareholder-card-wrapper:last-child:nth-child(odd) {
-  grid-column: span 2;
+/* Shared grid for header + rows */
+.sh-col-head,
+.sh-row {
+  display: grid;
+  grid-template-columns: 1fr 150px 130px 84px 32px;
+  gap: 12px;
+  align-items: center;
 }
 
-.shareholder-card-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* Column header — reuses the app's field-label typography */
+.sh-col-head {
+  padding: 0 8px 10px;
+  border-bottom: 1px solid var(--border);
 }
+.sh-col-head > div {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.sh-col-head .l { padding-left: 8px; }
+.sh-col-head .r { text-align: right; padding-right: 8px; }
+
+/* Row */
+.sh-row {
+  position: relative;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px;
+}
+.sh-row:last-of-type { border-bottom: none; }
+.sh-row:hover { background: var(--surface); }
+
+/* Name truncates instead of forcing the row taller */
+.sh-row .row-name {
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Owned % — promoted into its own aligned column */
+.sh-row .row-pct {
+  text-align: right;
+  padding-right: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Delete reveals on row/card hover — cap table, SAFEs, priced round */
+.sh-row .row-trash-btn,
+.input-row-card .row-trash-btn,
+.series-investor-row .row-trash-btn {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.sh-row:hover .row-trash-btn,
+.input-row-card:hover .row-trash-btn,
+.series-investor-row:hover .row-trash-btn { opacity: 1; }
+
+/* Faint surface highlight on hover — all three steps */
+.input-row-card { transition: background 0.15s; }
+.input-row-card:hover,
+.series-investor-row:hover { background: var(--surface); }
 
 /* Step Indicator */
 .step-indicator {
@@ -1822,14 +1974,27 @@ table select {
     gap: 12px !important;
   }
 
-  /* Shareholder grid: single column on mobile */
-  #shareholders-body {
-    grid-template-columns: 1fr;
+  /* Shareholder list: stack each row into a card on mobile */
+  .sh-col-head { display: none !important; }
+  .sh-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    padding: 14px 12px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    margin-bottom: 8px !important;
   }
-
-  #shareholders-body .shareholder-card-wrapper:last-child:nth-child(odd) {
-    grid-column: span 1 !important;
+  .sh-row .row-name { grid-column: 1 / -1 !important; padding-right: 28px; }
+  .sh-row .row-pct { text-align: left !important; padding-right: 0 !important; }
+  .sh-row .row-trash-btn {
+    opacity: 1 !important;
+    position: absolute;
+    top: 12px;
+    right: 10px;
   }
+  /* Touch has no hover — keep delete visible everywhere */
+  .input-row-card .row-trash-btn,
+  .series-investor-row .row-trash-btn { opacity: 1 !important; }
 
   /* Series investor row: stack name & input */
   .series-investor-row {
@@ -2419,6 +2584,10 @@ table select {
               </div>
               <div id="series-body"></div>
             </div>
+            <!-- Calculate results -->
+            <div class="priced-calc-row">
+              <button id="priced-calc-btn" class="priced-calc-btn" onclick="calculateResults()">Calculate ▸</button>
+            </div>
             <!-- Nav buttons -->
             <div class="step-nav-row">
               <button class="step-nav-btn" onclick="goToStep(2)">◂ Back</button>
@@ -2429,6 +2598,20 @@ table select {
 
       <div class="results-column">
         <div class="results-column-sticky">
+        <!-- Stale results overlay -->
+        <div class="stale-overlay">
+          <div class="stale-card">
+            <div class="stale-card-text">
+              <span class="stale-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>
+                Outdated
+              </span>
+              <span class="stale-card-title">Showing previous results.</span>
+              <span class="stale-card-sub">Recalculate to update.</span>
+            </div>
+            <button class="stale-recalc-btn" onclick="calculateResults()">Recalculate ▸</button>
+          </div>
+        </div>
         <!-- Action Buttons -->
         <div class="results-toolbar">
           <button onclick="showEmailModal('download')" class="toolbar-btn">
@@ -2572,6 +2755,20 @@ table select {
               Download report
             </button>
           </div>
+        </div>
+      </div>
+      <!-- Stale results overlay -->
+      <div class="stale-overlay">
+        <div class="stale-card">
+          <div class="stale-card-text">
+            <span class="stale-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>
+              Outdated
+            </span>
+            <span class="stale-card-title">Showing previous results.</span>
+            <span class="stale-card-sub">Recalculate to update the cap table.</span>
+          </div>
+          <button class="stale-recalc-btn" onclick="calculateResults()">Recalculate ▸</button>
         </div>
       </div>
     </section>
@@ -2756,26 +2953,12 @@ table select {
 
     <!-- Templates -->
     <template id="shareholder-card-template">
-      <div class="shareholder-card-wrapper">
-        <div class="input-row-card">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-            <input class="input row-name" type="text" placeholder="Name" style="flex:1;min-width:0;" />
-            <button class="btn-trash row-trash-btn"></button>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:flex-end;">
-            <div>
-              <label class="field-label row-field-label">Category</label>
-              <select class="select row-category" style="width:100%;"></select>
-            </div>
-            <div>
-              <label class="field-label row-field-label">Shares</label>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <input class="input row-input-right row-shares" type="text" style="flex:1;min-width:0;" />
-                <div class="row-pct" style="font-size:0.6875rem;font-weight:400;color:#9ca3af;flex-shrink:0;white-space:nowrap;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="sh-row">
+        <input class="input row-name" type="text" placeholder="Shareholder name" />
+        <select class="select row-category"></select>
+        <input class="input row-input-right row-shares" type="text" />
+        <div class="row-pct"></div>
+        <button class="btn-trash row-trash-btn"></button>
       </div>
     </template>
 
@@ -3567,6 +3750,18 @@ const INITIAL_STATE = {
 
 let state = JSON.parse(JSON.stringify(INITIAL_STATE));
 
+let resultsStale = false;
+
+const setResultsStale = (stale) => {
+    resultsStale = stale;
+    const rc = document.querySelector(".results-column-sticky");
+    const bd = document.getElementById("breakdown-section");
+    if (rc) rc.classList.toggle("is-stale", stale);
+    if (bd) bd.classList.toggle("is-stale", stale);
+};
+
+window.calculateResults = () => updateUI({ compute: true });
+
 window.goToStep = function(step) {
   const sections = {
     1: 'cap-table-section',
@@ -3609,96 +3804,100 @@ const clearGlobalErrors = () => {
 
 const TRASH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>`;
 
-const updateUI = () => {
-    try {
-        clearGlobalErrors();
-        
-        const preMoneyErrorEl = document.getElementById("pre-money-error");
-        const preMoneyInputWrapper = document.querySelector(".valuation-input-wrapper");
-        
+// Renders the live, always-on parts of the UI: validation, editable rows,
+// and current cap-table figures. Safe to run on every keystroke.
+const renderInputs = () => {
+    clearGlobalErrors();
+
+    const preMoneyErrorEl = document.getElementById("pre-money-error");
+    const preMoneyInputWrapper = document.querySelector(".valuation-input-wrapper");
+
+    if (preMoneyErrorEl) {
+        preMoneyErrorEl.textContent = "";
+        preMoneyErrorEl.style.display = "none";
+    }
+    if (preMoneyInputWrapper) preMoneyInputWrapper.classList.remove("input-invalid-border");
+
+    // Contextual Pre-money Validation: only show error if investment exists WITHOUT a cap or discount
+    const hasInvestmentWithoutTerms = state.rowData.some(r => {
+        if (r.type === CapTableRowType.Safe) {
+            return r.investment > 0 && (r.cap === 0 || !r.cap) && (r.discount === 0 || !r.discount);
+        }
+        return false;
+    });
+
+    if (state.preMoney <= 0 && hasInvestmentWithoutTerms) {
         if (preMoneyErrorEl) {
-            preMoneyErrorEl.textContent = "";
-            preMoneyErrorEl.style.display = "none";
+            preMoneyErrorEl.textContent = "Pre-money valuation is required and must be greater than 0.";
+            preMoneyErrorEl.style.display = "block";
         }
-        if (preMoneyInputWrapper) preMoneyInputWrapper.classList.remove("input-invalid-border");
+        if (preMoneyInputWrapper) preMoneyInputWrapper.classList.add("input-invalid-border");
+    }
 
-        // Contextual Pre-money Validation: only show error if investment exists WITHOUT a cap or discount
-        const hasInvestmentWithoutTerms = state.rowData.some(r => {
-            if (r.type === CapTableRowType.Safe) {
-                return r.investment > 0 && (r.cap === 0 || !r.cap) && (r.discount === 0 || !r.discount);
-            }
-            return false;
-        });
+    const preMoneyInput = document.getElementById("pre-money-input");
+    if (preMoneyInput && document.activeElement !== preMoneyInput) {
+        preMoneyInput.value = formatNumberWithCommas(state.preMoney);
+    }
 
-        if (state.preMoney <= 0) {
-            if (hasInvestmentWithoutTerms) {
-                if (preMoneyErrorEl) {
-                    preMoneyErrorEl.textContent = "Pre-money valuation is required and must be greater than 0.";
-                    preMoneyErrorEl.style.display = "block";
-                }
-                if (preMoneyInputWrapper) preMoneyInputWrapper.classList.add("input-invalid-border");
-            }
-            
-            // Still clear results if pre-money is 0, just without the red error message visibility
-            document.getElementById("round-pps-val").textContent = "—";
-            document.getElementById("post-money-val").textContent = "—";
-            document.getElementById("total-post-shares-val").textContent = "—";
-            document.getElementById("founder-ownership-val").textContent = "—";
-            document.getElementById("founder-dilution-val").textContent = "—";
-            document.getElementById("post-round-table").innerHTML = "";
-            document.getElementById("pie-chart-container").innerHTML = "";
-            document.getElementById("ai-insights-container").innerHTML = "";
-            return;
-        }
+    const targetOptionsInput = document.getElementById("target-options-input");
+    if (targetOptionsInput && document.activeElement !== targetOptionsInput) {
+        targetOptionsInput.value = state.targetOptionsPool === null ? "" : state.targetOptionsPool;
+    }
 
-        // =========================================================================
-        // SNAPSHOT 2: PRE-ROUND CAP TABLE (Post-SAFE)
-        // =========================================================================
-        const preRound = buildEstimatedPreRoundCapTable(state.rowData);
+    const rawSafes = state.rowData.filter((r) => r.type === CapTableRowType.Safe);
+    const safes = populateSafeCaps(rawSafes, state.preMoney);
+    const safeErrors = checkSafeNotesForErrors(safes);
 
-        const preMoneyInput = document.getElementById("pre-money-input");
-        if (preMoneyInput && document.activeElement !== preMoneyInput) {
-            preMoneyInput.value = formatNumberWithCommas(state.preMoney);
-        }
+    renderSAFEs(safeErrors);
+    renderSeriesInvestors();
 
-        const targetOptionsInput = document.getElementById("target-options-input");
-        if (targetOptionsInput && document.activeElement !== targetOptionsInput) {
-            targetOptionsInput.value = state.targetOptionsPool === null ? "" : state.targetOptionsPool;
-        }
+    const esopRow = state.rowData.find((r) => r.id === "UnusedOptionsPool");
+    const unusedOptionsValue = esopRow ? esopRow.shares : 0;
 
-        const rawSafes = state.rowData.filter((r) => r.type === CapTableRowType.Safe);
-        const safes = populateSafeCaps(rawSafes, state.preMoney);
-        const safeErrors = checkSafeNotesForErrors(safes);
+    // Current Cap Table Snapshot (for input management)
+    const currentTotalShares = state.rowData
+        .filter((r) => r.type === CapTableRowType.Common)
+        .reduce((a, r) => a + r.shares, 0);
 
-        renderSAFEs(safeErrors);
-        renderSeriesInvestors();
+    const totalSharesVal = document.getElementById("total-shares-val");
+    if (totalSharesVal) totalSharesVal.textContent = formatNumberWithCommas(currentTotalShares);
 
-        const esopRow = state.rowData.find((r) => r.id === "UnusedOptionsPool");
-        const unusedOptionsValue = esopRow ? esopRow.shares : 0;
+    const currentEsopVal = document.getElementById("current-esop-val");
+    if (currentEsopVal) currentEsopVal.textContent = formatNumberWithCommas(unusedOptionsValue);
 
-        // Current Cap Table Snapshot (for input management)
-        const currentTotalShares = state.rowData
-            .filter((r) => r.type === CapTableRowType.Common)
-            .reduce((a, r) => a + r.shares, 0);
+    renderShareholders(currentTotalShares);
+};
 
-        const totalSharesVal = document.getElementById("total-shares-val");
-        if (totalSharesVal) totalSharesVal.textContent = formatNumberWithCommas(currentTotalShares);
+// Runs the priced-round computation and renders all derived results
+// (results card, breakdown table, pie chart, AI insights). Gated behind Calculate.
+const computeResults = () => {
+    const clearResults = () => {
+        document.getElementById("round-pps-val").textContent = "—";
+        document.getElementById("post-money-val").textContent = "—";
+        document.getElementById("total-post-shares-val").textContent = "—";
+        document.getElementById("founder-ownership-val").textContent = "—";
+        document.getElementById("founder-dilution-val").textContent = "—";
+        const prt = document.getElementById("post-round-table"); if (prt) prt.innerHTML = "";
+        const pcc = document.getElementById("pie-chart-container"); if (pcc) pcc.innerHTML = "";
+        const aic = document.getElementById("ai-insights-container"); if (aic) aic.innerHTML = "";
+    };
 
-        const currentEsopVal = document.getElementById("current-esop-val");
-        if (currentEsopVal) currentEsopVal.textContent = formatNumberWithCommas(unusedOptionsValue);
+    if (state.preMoney <= 0) { clearResults(); return; }
 
-        renderShareholders(currentTotalShares);
+    const rawSafes = state.rowData.filter((r) => r.type === CapTableRowType.Safe);
+    const safes = populateSafeCaps(rawSafes, state.preMoney);
+    const safeErrors = checkSafeNotesForErrors(safes);
+    if (Object.keys(safeErrors).length > 0) { clearResults(); return; }
 
-        if (Object.keys(safeErrors).length > 0) {
-            document.getElementById("round-pps-val").textContent = "—";
-            document.getElementById("post-money-val").textContent = "—";
-            document.getElementById("total-post-shares-val").textContent = "—";
-            document.getElementById("founder-ownership-val").textContent = "—";
-            document.getElementById("founder-dilution-val").textContent = "—";
-            document.getElementById("post-round-table").innerHTML = "";
-            return; 
-        }
+    // =========================================================================
+    // SNAPSHOT 2: PRE-ROUND CAP TABLE (Post-SAFE)
+    // =========================================================================
+    const preRound = buildEstimatedPreRoundCapTable(state.rowData);
 
+    const esopRow = state.rowData.find((r) => r.id === "UnusedOptionsPool");
+    const unusedOptionsValue = esopRow ? esopRow.shares : 0;
+
+    {
         const roundNames = document.querySelectorAll(".display-round-name");
         roundNames.forEach(el => {
             el.textContent = state.roundName || "priced round";
@@ -3815,7 +4014,22 @@ const updateUI = () => {
         renderBreakdownTable(preRound, postRound, pricedConversion.pps);
         renderPieChart(postRound);
         renderAIAdvisor(preRound, postRound, pricedConversion, state, totalFounderPctPre);
+    }
+};
 
+// Orchestrator. Always re-renders inputs; only recomputes results when
+// compute === true (Calculate / initial load / reset). Otherwise marks the
+// results stale and reveals the blur + "Recalculate" overlay.
+const updateUI = (opts = {}) => {
+    const compute = !(opts && opts.compute === false);
+    try {
+        renderInputs();
+        if (compute) {
+            computeResults();
+            setResultsStale(false);
+        } else {
+            setResultsStale(true);
+        }
     } catch (error) {
         console.error("Error updating UI:", error);
     }
@@ -3823,7 +4037,14 @@ const updateUI = () => {
 
 const renderShareholders = (totalSharesS0) => {
     const container = document.getElementById("shareholders-body");
-    container.innerHTML = "";
+    container.innerHTML = `
+        <div class="sh-col-head">
+            <div class="l">Name</div>
+            <div class="l">Category</div>
+            <div class="r">Shares</div>
+            <div class="r">Owned</div>
+            <div></div>
+        </div>`;
     const shareholders = state.rowData.filter((r) => r.type === CapTableRowType.Common);
     const showDelete = shareholders.length > 1;
     const template = document.getElementById("shareholder-card-template");
@@ -4424,7 +4645,7 @@ window.updateRow = (id, field, value) => {
         });
         state.rowData = [...commonRows, ...safeRows, ...seriesRows];
     }
-    updateUI();
+    updateUI({ compute: false });
 };
 
 window.addRow = (type) => {
@@ -4451,7 +4672,7 @@ window.addRow = (type) => {
     } else if (type === CapTableRowType.Series) {
         state.rowData.push({ id, type, name: "New Investor", investment: 0 });
     }
-    updateUI();
+    updateUI({ compute: false });
 };
 
 window.deleteRow = (id) => {
@@ -4478,14 +4699,14 @@ window.deleteRow = (id) => {
     }
 
     state.rowData = state.rowData.filter((r) => r.id !== id);
-    updateUI();
+    updateUI({ compute: false });
 };
 
 window.togglePricedRound = () => {
     state.pricedRounds = state.pricedRounds === 0 ? 1 : 0;
     const btn = document.getElementById("toggle-priced-btn");
     if (btn) btn.textContent = state.pricedRounds > 0 ? "Remove Priced Round" : "Add Priced Round";
-    updateUI();
+    updateUI({ compute: false });
 };
 
 window.updateGlobal = (field, value) => {
@@ -4494,7 +4715,7 @@ window.updateGlobal = (field, value) => {
     } else {
         state[field] = value;
     }
-    updateUI();
+    updateUI({ compute: false });
 };
 
 window.calculateSafeDiscount_UI = (btn) => {
@@ -4504,7 +4725,7 @@ window.calculateSafeDiscount_UI = (btn) => {
 
     if (state.preMoney <= 0) {
         // Valuation error will already be shown by updateUI, but let's make sure it's clear
-        updateUI(); 
+        updateUI({ compute: false });
         return;
     }
 
