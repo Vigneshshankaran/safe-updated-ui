@@ -2447,14 +2447,14 @@ table select {
 
           <!-- Results label/heading -->
           <div class="sc-results-label">
-            Impact of <strong>Series A</strong> on founder(s)
+            Impact of <strong class="display-round-name"></strong> on founder(s)
           </div>
 
           <!-- Stats grid (two columns) -->
           <div class="sc-stats-grid">
             <div class="sc-stat-large">
               <span id="founder-ownership-val" class="sc-stat-value purple">0.00%</span>
-              <span class="sc-stat-sublabel">Ownership after Series A</span>
+              <span class="sc-stat-sublabel">Ownership after <span class="display-round-name"></span></span>
             </div>
             <div class="sc-stat-large">
               <span id="founder-dilution-val" class="sc-stat-value grey">0.00%</span>
@@ -2514,7 +2514,7 @@ table select {
           </div>
 
           <p style="font-size: 11px; color: #9ca3af; margin-top: 12px; line-height: 1.4;">
-            Note: All "before" and "after" figures assume all SAFEs have converted. If there are no SAFEs, the figures reflect the cap table before the priced round.
+            Note: All "before <span class="display-round-name"></span>" and "after <span class="display-round-name"></span>" figures assume all SAFEs have converted. If there are no SAFEs, the figures reflect the cap table before the priced round.
           </p>
         </div>
 
@@ -4672,7 +4672,7 @@ const prepareReportData = (companyName) => {
                 investment: r.investment,
                 cap: safeMatch?.cap || 0,
                 discount: r.discount ? (r.discount * 100).toFixed(0) + "%" : "None",
-                type: r.conversionType ? r.conversionType.charAt(0).toUpperCase() + r.conversionType.slice(1) + "-money" : "N/A"
+                type: r.conversionType === "mfn" ? "MFN-money" : (r.conversionType ? r.conversionType.charAt(0).toUpperCase() + r.conversionType.slice(1) + "-money" : "N/A")
             };
         }),
         ...pricedTable.series.map(r => ({
@@ -4714,11 +4714,12 @@ const prepareReportData = (companyName) => {
 
     const ownershipPre = safeFormatPercent(totalFounderPctPre);
 
-    const targetPoolVal = Number(state.targetOptionsPool);
-    const optionPoolDisplay = targetPoolVal > 0 ? targetPoolVal + "%" : "";
+    const optionPoolDisplay = state.targetOptionsPool + "%";
 
     return {
         companyName: companyName || "My Company",
+        valuation: state.preMoney,
+        raised: pricedConversion.totalSeriesInvestment,
         roundName: state.roundName || "priced round",
         timestamp: timestamp,
         optionPool: optionPoolDisplay,
