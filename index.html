@@ -828,7 +828,7 @@ b {
   align-self: flex-start;
   margin-top: 20px;
   max-height: calc(100vh - 72px - 24px);
-  overflow-y: visible;
+  overflow-y: auto;
   border-radius: 8px;
   border-left: 1px solid #eae7ff;
   padding-left: 24px;
@@ -2279,14 +2279,16 @@ table select {
       }
 
       .sc-tag {
-        font-size: 11px;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #eff6ff;
+        color: #2663EB !important;
+        border: 1px solid #2663EB;
+        font-family: 'Inter', sans-serif;
         font-weight: 600;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: #5f46ff;
-        background: #f0eefd;
-        padding: 2px 8px;
-        border-radius: 6px;
         margin-left: auto;
       }
 
@@ -3741,55 +3743,37 @@ const INITIAL_STATE = {
             id: "1",
             type: "common",
             name: "Founder 1",
-            shares: 7039184,
+            shares: 4000000,
             category: "Founder",
         },
         {
             id: "2",
             type: "common",
             name: "Founder 2",
-            shares: 9820291,
+            shares: 4000000,
             category: "Founder",
         },
         {
             id: "UnusedOptionsPool",
             type: "common",
             name: "Option pool",
-            shares: 882860,
+            shares: 2000000,
             category: "Option pool",
         },
         {
             id: "3",
             type: "safe",
             name: "SAFE 1",
-            investment: 123456,
-            cap: 462912420,
-            discount: 0,
-            conversionType: "mfn",
-        },
-        {
-            id: "4",
-            type: "safe",
-            name: "SAFE 2",
-            investment: 987650,
-            cap: 123456789,
-            discount: 0,
-            conversionType: "pre",
-        },
-        {
-            id: "5",
-            type: "safe",
-            name: "SAFE 3",
-            investment: 749210,
-            cap: 462912420,
-            discount: 0,
+            investment: 500000,
+            cap: 1000000,
+            discount: 0.2, 
             conversionType: "post",
         },
-        { id: "6", type: "series", name: "Investor 1", investment: 48601837 },
+        { id: "4", type: "series", name: "Investor 1", investment: 2000000 },
     ],
-    preMoney: 100000000,
-    targetOptionsPool: 10,
-    pricedRounds: 1,
+    preMoney: 10000000,
+    targetOptionsPool: null,
+    pricedRounds: 1, 
 };
 
 let state = JSON.parse(JSON.stringify(INITIAL_STATE));
