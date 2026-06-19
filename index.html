@@ -119,7 +119,7 @@
 
     .sc-accent-bar {
       height: 4px;
-      background: #5f46ff;
+      background: #F3F0FF;
       width: 100%;
     }
 
@@ -262,6 +262,9 @@
       border-radius: 8px;
       transition: width 0.3s ease;
     }
+    #founder-before-bar {
+      background: #c4bfff;
+    }
 
     .sc-bar-value {
       font-size: 13px;
@@ -376,10 +379,10 @@
     .sc-anchor-btn {
       width: calc(100% - 32px);
       padding: 16px 20px;
-      border: 2px dashed #ccc6ff;
+      border: 2px dashed #cbd5e1;
       border-radius: 12px;
-      background: #f0eefd;
-      color: #5f46ff;
+      background: #f4f5f7;
+      color: #444266;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -391,7 +394,7 @@
     }
 
     .sc-anchor-btn:hover {
-      border-color: #5f46ff;
+      border-color: #9ca3af;
       background: #f9f8fc;
     }
 
@@ -574,7 +577,7 @@ h1 {
 }
 
 .additional-shares-note {
-  color: #5f46ff;
+  color: #444266;
   font-size: 12px;
   font-weight: 500; /* Standardized */
 }
@@ -1558,7 +1561,7 @@ table select {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: #ccc6ff;
+  color: #9ca3af;
   user-select: none;
   flex: 1;
   justify-content: center;
@@ -1570,7 +1573,7 @@ table select {
   border: 1.5px solid transparent;
 }
 .step-item.completed {
-  color: #5f46ff;
+  color: #444266;
 }
 .step-number {
   width: 22px;
@@ -1582,16 +1585,16 @@ table select {
   font-size: 12px;
   font-weight: 600;
   flex-shrink: 0;
-  background: #eae8f5;
-  color: #ccc6ff;
+  background: #eceef2;
+  color: #9ca3af;
 }
 .step-item.active .step-number {
   background: #5f46ff;
   color: #ffffff;
 }
 .step-item.completed .step-number {
-  background: #eae7ff;
-  color: #5f46ff;
+  background: #eceef2;
+  color: #444266;
 }
 .step-nav-btn {
   display: inline-flex;
@@ -2677,7 +2680,7 @@ table select {
           <div class="sc-results-label">Founder Ownership</div>
 
           <div class="sc-comparison-row">
-            <label class="sc-comparison-label">Before round</label>
+            <label class="sc-comparison-label">Before <span class="display-round-name"></span></label>
             <div class="sc-bar-container">
               <div class="sc-bar-bg">
                 <div class="sc-bar-fill" id="founder-before-bar" style="width: 0%"></div>
@@ -2687,7 +2690,7 @@ table select {
           </div>
 
           <div class="sc-comparison-row">
-            <label class="sc-comparison-label">After round</label>
+            <label class="sc-comparison-label">After <span class="display-round-name"></span></label>
             <div class="sc-bar-container">
               <div class="sc-bar-bg">
                 <div class="sc-bar-fill" id="founder-after-bar" style="width: 0%"></div>
@@ -2696,7 +2699,7 @@ table select {
             </div>
           </div>
 
-          <p style="font-size: 11px; color: #9ca3af; margin-top: 12px; line-height: 1.4;">
+          <p style="font-size: 11px; color: #9ca3af; margin-top: 12px; line-height: 1.4; background: #FEF9EC; padding: 10px 12px; border-radius: 8px;">
             Note: All "before <span class="display-round-name"></span>" and "after <span class="display-round-name"></span>" figures assume all SAFEs have converted. If there are no SAFEs, the figures reflect the cap table before the priced round.
           </p>
         </div>
@@ -4338,7 +4341,7 @@ const getRowColor = (row) => {
     if (category === "Founder" || (name && name.toLowerCase().includes("founder"))) {
         return "#5f46ff";
     }
-    
+
     // SAFEs - darker purple
     if (isPricedOrSafe && (id.includes("SAFE") || name.includes("SAFE"))) {
         return "#7464ff";
@@ -4444,7 +4447,7 @@ const renderPieChart = (postRound) => {
     if (!rowData.length) { container.innerHTML = ''; return; }
 
     const categoryPalettes = {
-        "Founder": ["#5f46ff", "#9b8fff", "#c4bfff"],
+        "Founder": ["#475569", "#64748b", "#94a3b8"],
         "Investor": ["#3b82f6", "#60a5fa", "#93c5fd"],
         "Option pool": ["#f6c343", "#f9d77e", "#fbe8b0"],
         "Other": ["#64748b", "#94a3b8", "#cbd5e1"]
