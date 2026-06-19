@@ -295,8 +295,13 @@ They can't be cleanly split after the fact since the redesign was never separate
 snapshotted. This very file (`HANDOFF-cap-table-redesign.md`) is the only local
 file NOT committed — it's still untracked (`??`).
 
-**No PR has been created.** `gh` is not installed (no CLI). User explicitly said
-to wait — do NOT push or open a PR without a fresh go-ahead.
+> ⚠️ **SUPERSEDED — see §14 (Session 3).** As of 2026-06-19 the branch has a 4th
+> commit, repo-local git identity was set, and the branch was pushed to `origin`.
+> The "no PR / don't push" instruction below is no longer current.
+
+**(Historical, as of Session 2)** No PR has been created. `gh` is not installed
+(no CLI). User explicitly said to wait — do NOT push or open a PR without a fresh
+go-ahead.
 
 ## 13. Investigations this session (read-only — no code changed)
 
@@ -318,3 +323,113 @@ to wait — do NOT push or open a PR without a fresh go-ahead.
   round. So it captures dilution from the round + pool top-up only — NOT the SAFE
   conversion itself (the baseline is already post-SAFE). Shown in
   `founder-dilution-val`, the `dilution-summary-note`, and the PDF `dilution` field.
+
+---
+
+# SESSION 3 — Color / accent refinements + git push (2026-06-19)
+
+## 14. Goal of the session
+
+Reduce the "everything is purple" feeling of the results UI so the purple-tinted
+background reads as a deliberate brand wash, then commit/push the work. The page
+background itself was **not** changed (user constraint: can't change it). Instead
+we pulled purple back to a few intentional accent roles and neutralized the rest.
+
+**Purple is now reserved for: the hero stat (`56.04%`), primary buttons
+(Calculate / Next), the active wizard tab, the founder ownership bars, the
+"SAFE" wordmark, and the "Cap table after [round]" section (dots + heading).**
+Everything else that was purple was muted.
+
+## 15. Exact changes made to `safe-updated-ui/index.html`
+
+All edits are CSS/inline-style/JS-palette only — no markup/logic changes.
+
+### Accent pull-back (CSS)
+- **`.step-item`** inactive label color `#ccc6ff` → `#9ca3af` (grey).
+- **`.step-number`** default `background:#eae8f5; color:#ccc6ff` →
+  `background:#eceef2; color:#9ca3af`. Active step number kept purple.
+- **`.step-item.completed`** label `#5f46ff` → `#444266`; its `.step-number`
+  `background:#eae7ff; color:#5f46ff` → `background:#eceef2; color:#444266`.
+- **`.sc-anchor-btn`** ("View full results"): dashed border `#ccc6ff` → `#cbd5e1`,
+  `background:#f0eefd` → `#f4f5f7`, text `#5f46ff` → `#444266`; hover border
+  `#5f46ff` → `#9ca3af`.
+- **`.additional-shares-note`** ("+N shares will be added") `#5f46ff` → `#444266`.
+
+### Founder ownership bars — two-tone (CSS)
+- **`.sc-bar-fill`** base stays brand purple `#5f46ff` (this is the "After" bar).
+- **Added `#founder-before-bar { background: #c4bfff; }`** so the "Before" bar is
+  a muted lavender. Rationale: encode the dilution visually (Before 93% muted →
+  After 56% solid) instead of two identical purple bars. (Intermediate attempts
+  used slate `#64748b`; reverted to purple per user, then two-toned.)
+
+### Conversion note callout (inline)
+- The `<p>` note ("All before/after figures assume all SAFEs have converted…")
+  got `background:#FEF9EC; padding:10px 12px; border-radius:8px;` added to its
+  inline style. Text color left `#9ca3af` (slightly low contrast on cream — open
+  item if a darker warm text like `#8a6d3b` is wanted).
+
+### Impact-card accent bar (CSS)
+- **`.sc-accent-bar`** `background:#5f46ff` → **`#F3F0FF`** (very light lavender,
+  intentionally low-attention). History: tried `#201547` (deep indigo) and
+  `#F7F5F3` (too light/invisible) before settling on `#F3F0FF`.
+
+### "Cap table after [round]" — left/restored to PURPLE (do not mute)
+- **`getRowColor()`** (~line 4329, drives the breakdown-table `.name-dot`):
+  Founders `#5f46ff`, SAFEs `#7464ff`, default `#5f46ff` — these were briefly
+  changed to slate/blue then **reverted to purple** at user request. This section
+  is the bottom full-width "Cap table after Series A" table.
+- The "Cap table after [round]" H2 round-name accent span inline color is
+  `#5f46ff` (briefly set to `#0d0a40`, reverted).
+
+### Pie-chart legend palette — left as slate (NOT reverted)
+- **`categoryPalettes.Founder`** (~line 4447) is `["#475569","#64748b","#94a3b8"]`
+  (slate). This feeds the **pie chart** (`pieChartInstance`), a *different*
+  component from the breakdown table. Intentionally left muted. ⚠️ Don't confuse
+  this with `getRowColor` above — the table dots and the pie legend have separate
+  color sources.
+
+## 16. Git state (current — supersedes §12)
+
+Branch `feature/manual-calculate-results`, now **4 commits**, pushed to `origin`
+(`https://github.com/Vigneshshankaran/safe-updated-ui.git`):
+- `958c21e` Create index.html
+- `dc2f0ee` Update index.html (Vignesh Shankaran)
+- `946fc27` Gate priced-round results behind a manual Calculate button
+- `3f6f700` **Reduce purple accent load and refine results-panel styling** — this
+  session. Includes the §15 styling work, the previously-untracked
+  `HANDOFF-cap-table-redesign.md`, and the §11 dynamic-label edits that were still
+  uncommitted in the working tree.
+
+**Git identity:** set **repo-local only** (not global) to
+`farheen-cyber <farheen@equitylist.co>`; commit `3f6f700` was amended with
+`--reset-author` to use it (the original was the auto-detected
+`Farheen Shaikh <…@Farheens-MacBook-Air.local>`).
+
+**PR:** `gh` still not installed and no API token in the environment, so the PR
+was **not** created programmatically. A pre-filled GitHub compare URL was handed
+to the user to click "Create pull request":
+`https://github.com/Vigneshshankaran/safe-updated-ui/compare/main...feature/manual-calculate-results?expand=1` (+ title/body params). PR base is `main`, so it
+includes both `946fc27` and `3f6f700`.
+
+## 17. Open items / follow-ups
+
+1. **Note callout text contrast** — `#9ca3af` on `#FEF9EC` is low-contrast;
+   consider darkening to a warm `#8a6d3b` (accessibility).
+2. **Step indicator "active" pill** still uses `background:#eae7ff` (lavender) —
+   intentionally kept as the active highlight; revisit only if more de-purpling
+   is wanted.
+3. **PR not opened** — only the compare URL was generated; confirm whether the
+   user opened it.
+4. **SAFE badge chips** (`MFN SAFE`, `PRE-MONEY SAFE`, `POST-MONEY SAFE`, the
+   `.sc-tag` class) were left purple text on light-purple — a candidate for
+   muting if a future pass wants even less purple.
+
+## 18. Verified in-browser (Claude Preview, :8092)
+
+Each change was confirmed via screenshot + `getComputedStyle` reads:
+- Step indicators: only the active tab/number is purple; completed/inactive grey.
+- Founder bars: Before `rgb(196,191,255)` (#c4bfff), After `rgb(95,70,255)`
+  (#5f46ff).
+- Breakdown dots after revert: Founders `rgb(95,70,255)`, SAFEs `rgb(116,100,255)`.
+- Accent bar: `rgb(243,240,255)` (#F3F0FF).
+- "Cap table after" H2 accent: `rgb(95,70,255)`.
